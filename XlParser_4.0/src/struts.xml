@@ -20,14 +20,57 @@
 			<result name="doubleSuccess">parsedXl.jsp</result>
 			<result name="error">parser.jsp</result>
 		</action>
+		
+		<action name="fetchTickets" class="com.centurylink.xprsr.action.FetchTicketAction">
+		    <interceptor-ref name="completeStack" />
+            <interceptor-ref name="execAndWait">
+                <param name="delay">500</param>
+                <param name="delaySleepInterval">50</param>
+            </interceptor-ref>
+            <result name="wait">longRunningAction-wait.jsp</result>
+            <result name="success">fetchTickets.jsp</result>
+            <result name="doubleSuccess">blank.jsp</result>
+            <result name="error">blank.jsp</result>
+        </action>
+        
+                
+        <action name="assignTicketsDB" class="com.centurylink.xprsr.action.AssignTicketsDBAction">
+            <interceptor-ref name="completeStack" />
+            <interceptor-ref name="execAndWait">
+                <param name="delay">500</param>
+                <param name="delaySleepInterval">50</param>
+            </interceptor-ref>
+            <result name="wait">longRunningAction-wait.jsp</result>
+            <result name="success">blank.jsp</result>
+            <result name="doubleSuccess">blank.jsp</result>
+            <result name="error">blank.jsp</result>
+        </action>
+		
 
 		<action name="assignTickets" class="com.centurylink.xprsr.action.AssignTicketsAction"
 			method="ticketCounter">
 			<result name="success">autoAssignedXl.jsp</result>
 			<result name="error">parser.jsp</result>
 		</action>
+
+		<action name="refreshData" class="com.centurylink.xprsr.action.RefreshDataAction">
+		    <interceptor-ref name="completeStack" />
+            <interceptor-ref name="execAndWait">
+                <param name="delay">500</param>
+                <param name="delaySleepInterval">50</param>
+            </interceptor-ref>
+            <result name="wait">longRunningAction-wait.jsp</result>
+			<result name="success">dbHome.jsp</result>
+			<result name="error">dbHome.jsp</result>
+		</action>
 		
-		<action name="RefreshDataAction" class="com.centurylink.xprsr.action.refreshDataAction">
+		<action name="connectDB" class="com.centurylink.xprsr.action.ConnectDBAction">
+            <interceptor-ref name="completeStack" />
+            <interceptor-ref name="execAndWait">
+                <param name="delay">500</param>
+                <param name="delaySleepInterval">50</param>
+            </interceptor-ref>
+            <result name="wait">longRunningAction-wait.jsp</result>
             <result name="success">dbHome.jsp</result>
             <result name="error">dbHome.jsp</result>
         </action>
@@ -74,7 +117,6 @@
 			<result name="success">botReport.jsp</result>
 			<result name="error">botReport.jsp</result>
 		</action>
-
 	</package>
 </struts>
 

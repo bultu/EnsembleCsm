@@ -8,51 +8,63 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.centurylink.xprsr.dao.IRefreshDataDao;
-import com.centurylink.xprsr.db.DBManager;
+import com.centurylink.xprsr.db.DerbyDBManager;
+import com.centurylink.xprsr.db.OracleDBManager;
+import com.centurylink.xprsr.dto.ConnectDB;
 import com.centurylink.xprsr.dto.TicketsData;
 
 public class RefreshDataDao implements IRefreshDataDao {
-    Connection con1 = null;
-    Connection con2 = null;
+    Connection derbyCon = null;
+    Connection oracleCon = null;
 
     @Override
-    public void refreshData() {
-        String query1 = "TRUNCATE table ctli.tickets ; ";
-        String query2 = "select CATEGORY,CH_DOC_ID,FULL_USER_NAME,STATUS,CREATE_DATE,TITLE from ctli.ogs_tickets;";
-        String query3 = "INSERT into ctli.tickets (CATEGORY,CH_DOC_ID,FULL_USER_NAME,STATUS,CREATE_DATE,TITLE)" +
-        		        "VALUES ?, ?, ?, ?, ?, ?";
-        ArrayList<TicketsData> ticketsList = new ArrayList<TicketsData>();
+    public boolean refreshData() {
+        String query1 = "DELETE from ctli.tickets";
+        String query2 = "select CATEGORY,CH_DOC_ID,FULL_USER_NAME,STATUS,CREATE_DATE,TITLE from cuappc.ogs_tickets";
+        String query3 = "INSERT into ctli.tickets (CATEGORY,CH_DOC_ID,FULL_USER_NAME,STATUS,CREATE_DATE,TITLE)"
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         
+
+        ArrayList<TicketsData> ticketsList = new ArrayList<TicketsData>();
+
         try {
             /*
              * Create a connection to Derby database and truncate the tickets
              * table before filling it with fresh data
              */
-            con1 = DBManager.getInstance("Derby").getConnection("Derby");
-            PreparedStatement pstmt1 = con1.prepareStatement(query1);
-            pstmt1.executeQuery();
 
-            /* Create a connection to Oracle database and get fresh tickets data */
-            con2 = DBManager.getInstance("Derby").getConnection("Derby");
-            PreparedStatement pstmt2 = con2.prepareStatement(query2);
+            /*getOracleConnection();
+            getDerbyConnection();*/
+            
+            ConnectDB dbConnection = ConnectDB.getMyConnectionObject();
+            derbyCon = dbConnection.getDerbyCon();
+            oracleCon = dbConnection.getOracleCon();
+            
+            PreparedStatement pstmt1 = derbyCon.prepareStatement(query1);
+            pstmt1.executeUpdate();
+            
+            PreparedStatement pstmt2 = oracleCon.prepareStatement(query2);
             ResultSet rs = pstmt2.executeQuery();
+            
+            
 
-            if (rs.next()) {
-                
+            while (rs.next()) {
+
                 TicketsData tempTicketData = new TicketsData();
                 tempTicketData.setCategory(rs.getString("CATEGORY"));
                 tempTicketData.setCh_doc_id(rs.getString("CH_DOC_ID"));
-                tempTicketData.setFull_user_name(rs.getString("FULL_USER_NAME"));
+                tempTicketData
+                        .setFull_user_name(rs.getString("FULL_USER_NAME"));
                 tempTicketData.setStatus(rs.getString("STATUS"));
                 tempTicketData.setCreate_date(rs.getString("CREATE_DATE"));
-                tempTicketData.setTitle(rs.getString("TITLE"));                
+                tempTicketData.setTitle(rs.getString("TITLE"));
                 ticketsList.add(tempTicketData);
             }
-            
-            PreparedStatement pstmt3 = con1.prepareStatement(query3);
-            
+
+            PreparedStatement pstmt3 = derbyCon.prepareStatement(query3);
+
             Iterator<TicketsData> iterator = ticketsList.iterator();
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
                 TicketsData tempTicketData = iterator.next();
                 pstmt3.setString(1, tempTicketData.getCategory());
                 pstmt3.setString(2, tempTicketData.getCh_doc_id());
@@ -60,7 +72,7 @@ public class RefreshDataDao implements IRefreshDataDao {
                 pstmt3.setString(4, tempTicketData.getStatus());
                 pstmt3.setString(5, tempTicketData.getCreate_date());
                 pstmt3.setString(6, tempTicketData.getTitle());
-                pstmt3.executeQuery();
+                pstmt3.executeUpdate();
             }
 
         }
@@ -71,14 +83,26 @@ public class RefreshDataDao implements IRefreshDataDao {
 
         finally {
             try {
-                con1.close();
-                con2.close();
-            }
-
-            catch (SQLException e) {
-                System.out.println("Failed to close connection!");
+                /*derbyCon.close();
+                oracleCon.close();*/
+                System.out.println("Data Refreshed from OGS Tickets");
+            } catch (NullPointerException e) {
+                System.out.println("Connection doesn't exist");
+                return false;
+                
             }
         }
+        return true;
+    }
+    
+    public void getDerbyConnection() {
+        DerbyDBManager derbyDb = DerbyDBManager.getMyDBManagerObject();
+        derbyCon = derbyDb.getConnection();
+    }
+
+    public void getOracleConnection() {
+        OracleDBManager oracleDb = OracleDBManager.getMyDBManagerObject();
+        oracleCon = oracleDb.getConnection();
     }
 
 }

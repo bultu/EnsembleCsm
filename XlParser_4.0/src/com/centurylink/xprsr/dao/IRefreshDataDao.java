@@ -1,6 +1,10 @@
 package com.centurylink.xprsr.dao;
 
+
+
 public interface IRefreshDataDao
 {
-	public void refreshData();
+	public boolean refreshData();
+	public void getOracleConnection();
+	public void getDerbyConnection();
 }

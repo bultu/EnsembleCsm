@@ -37,11 +37,17 @@ body {
 						<li class="dropdown"><a href="#" class="dropdown-toggle"
 							data-toggle="dropdown">Database Connection <b class="caret"></b></a>
 							<ul class="dropdown-menu">
-								<li><a href="refreshDataAction.action">Refresh Data</a></li>
-								<li><a href="blank.jsp">Refresh Connection</a></li>
+								<li><a href="refreshData.action">Refresh Data</a></li>
+								<li><a href="connectDB.action">Re/Connect</a></li>
 							</ul></li>
 
-						<li><a href="blank.jsp">Ticket Assignment</a></li>
+						
+						<li class="dropdown"><a href="#" class="dropdown-toggle"
+                            data-toggle="dropdown">Ticket Assignment<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="fetchTickets.action">Ticket List</a></li>
+                                <li><a href="assignTicketsDB.action">Assign Tickets</a></li>
+                            </ul></li>
 
 						<li class="dropdown"><a href="#" class="dropdown-toggle"
 							data-toggle="dropdown">Reports <b class="caret"></b></a>

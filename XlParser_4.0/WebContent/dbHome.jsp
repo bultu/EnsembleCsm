@@ -16,6 +16,8 @@
     <div class="container">
 
         <h2 align="center">Welcome to Ensemble CSM</h2>
+        
+        <br> <br> <font color="#FF0000">${error}</font>
 
     </div>
 </body>
