@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="refresh" content="3;url=<s:url includeParams="all" />"/> 
+<meta http-equiv="refresh" content="1;url=<s:url includeParams="all" />"/> 
 <title>Action in Progress</title>
 </head>
 <body>

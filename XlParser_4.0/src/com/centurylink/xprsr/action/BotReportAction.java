@@ -9,6 +9,7 @@ import org.apache.struts2.ServletActionContext;
 
 import com.centurylink.xprsr.dto.BotRepData;
 import com.centurylink.xprsr.dto.ValidationData;
+import com.centurylink.xprsr.dto.WeeklyRepData;
 import com.centurylink.xprsr.service.IReadXlService;
 import com.centurylink.xprsr.service.IReportService;
 import com.centurylink.xprsr.service.impl.ReadXlService;

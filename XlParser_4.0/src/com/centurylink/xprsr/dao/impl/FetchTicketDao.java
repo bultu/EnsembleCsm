@@ -11,10 +11,12 @@ public class FetchTicketDao implements IFetchTicketDao
 {
     ConnectDB dbConnection = ConnectDB.getMyConnectionObject();
     Connection derbyCon = null;
+    double startTime = 0;
     
     @Override
 	public TreeMap<Integer, ArrayList<String>> fetchTickets()
 	{
+        startTime = System.nanoTime(); 
 	    int noOfRecords = 0;
 	    TreeMap<Integer, ArrayList<String>> table = new TreeMap<Integer, ArrayList<String>>();
 	    ArrayList<String> columnList = null;
@@ -58,7 +60,8 @@ public class FetchTicketDao implements IFetchTicketDao
 			System.out.println("Data not found!");
 			return null;
 		}
-		
+		double estimatedTime = System.nanoTime() - startTime;
+		System.out.println("Fetch tickets in "+estimatedTime/1000000000+" second(s)");
 		return table;
 	}
 

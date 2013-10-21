@@ -39,5 +39,7 @@ public interface IAssignTickets {
     boolean ticketsAvailableToAssign(
             TreeMap<Integer, ArrayList<String>> dataSheet,
             ArrayList<String> restrictedKeywords);
-
+    
+    public int getAssignedTicketCount();
+    public int getTotalTicketCount();
 }

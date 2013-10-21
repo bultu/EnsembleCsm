@@ -16,18 +16,18 @@ import com.opensymphony.xwork2.ActionSupport;
 /**
  * @author Anurag Chowdhury
  * @author Prateek Gupta
- * @version 4.0
+ * @version 1.0
  * @since JUNE 2013
  */
 public class AssignTicketsAction extends ActionSupport {
 
     private static final long serialVersionUID = 1L;
     IAssignTickets countTickets;
-    
+
     @SuppressWarnings("unchecked")
     TreeMap<Integer, ArrayList<String>> parsedSheet = (TreeMap<Integer, ArrayList<String>>) ServletActionContext
             .getRequest().getSession().getAttribute("parsedSheet");
-    
+
     public static String inputFilePath = (String) ServletActionContext
             .getRequest().getSession().getAttribute("inputFilePath");
     IReadXlService readXl = new ReadXlService();
@@ -44,7 +44,7 @@ public class AssignTicketsAction extends ActionSupport {
     String cc = null;
     String subject = null;
     String body = null;
-    
+
     public Integer getTotalTickets() {
         return totalTickets;
     }
@@ -117,11 +117,11 @@ public class AssignTicketsAction extends ActionSupport {
     public String getBody() {
         return body;
     }
-    
+
     public Integer getTotalRestrictedTickets() {
         return totalRestrictedTickets;
     }
-    
+
     /**
      * On "success", navigates to autoAssignedXl.jsp
      * 
@@ -138,10 +138,9 @@ public class AssignTicketsAction extends ActionSupport {
                     readXl.read(inputFilePath, "CATEGORIES"),
                     readXl.read(inputFilePath, "TICKET_STATUS"),
                     readXl.read(inputFilePath, "RESTRICTED_KEYWORDS"));
-                       
+
             for (Entry<Integer, ArrayList<String>> tableEntry : table
                     .entrySet()) {
-                totalTickets++;
                 if (!tableEntry.getValue().get(2).equalsIgnoreCase(" ")) {
                     totalAssignedTickets++;
                     assignedTable.put(tableEntry.getKey(),
@@ -149,17 +148,26 @@ public class AssignTicketsAction extends ActionSupport {
                 }
 
             }
-            /*ServletActionContext.getRequest().getSession()
-                    .setAttribute("assignedTable", table);*/
-            nameList = countTickets.getNames(readXl.read(inputFilePath, "THRESHOLD"));
+            ServletActionContext.getRequest().getSession()
+                    .setAttribute("assignedTable", table);
+            nameList = countTickets.getNames(readXl.read(inputFilePath,
+                    "THRESHOLD"));
             crushTreeMap(readXl.read(inputFilePath, "MAIL"));
-            
-            restrictedTicketsList = readXl.read(inputFilePath, "RESTRICTED_TICKETS");
-            
-            for (@SuppressWarnings("unused") Entry<Integer, ArrayList<String>> tableEntry : restrictedTicketsList
+
+            restrictedTicketsList = readXl.read(inputFilePath,
+                    "RESTRICTED_TICKETS");
+
+            for (@SuppressWarnings("unused")
+            Entry<Integer, ArrayList<String>> tableEntry : restrictedTicketsList
                     .entrySet()) {
-                totalRestrictedTickets++;
+                if (tableEntry.getValue().get(2).equalsIgnoreCase(" "))
+                    totalRestrictedTickets++;
             }
+
+            totalAssignedTickets = countTickets.getAssignedTicketCount();
+
+            totalTickets = countTickets.getTotalTicketCount();
+
             return "success";
 
         }

@@ -62,178 +62,146 @@ public class ReportService implements IReportService {
                             for (Entry<Integer, ArrayList<String>> tempStatusList : issueStatusList
                                     .entrySet()) {
                                 if (tempStatusList.getKey() != 0) {
-                                    try {
-                                        if (tempReadList
-                                                .getValue()
-                                                .get(columnNameList
-                                                        .indexOf("Issue SubStatus"))
-                                                .equalsIgnoreCase(
-                                                        tempStatusList
-                                                                .getValue()
-                                                                .get(1))) {
-                                            if (tempStatusList.getValue()
-                                                    .get(1)
-                                                    .contains("Withdrawn")) {
-                                                SimpleDateFormat formatter = new SimpleDateFormat(
-                                                        "MM/dd/yyyy");
-                                                Date changeToDate = formatter
-                                                        .parse(toDate);
-                                                Date changeFromDate = formatter
-                                                        .parse(fromDate);
-                                                String tempDate = tempStatusList
+                                    if (tempReadList
+                                            .getValue()
+                                            .get(columnNameList
+                                                    .indexOf("Issue SubStatus"))
+                                            .equalsIgnoreCase(
+                                                    tempStatusList.getValue()
+                                                            .get(1))) {
+                                        if (tempStatusList.getValue().get(1)
+                                                .contains("Withdrawn")
+                                                && tempReadList
                                                         .getValue()
                                                         .get(columnNameList
-                                                                .indexOf("Resolution Date"));
+                                                                .indexOf("Resolution Date"))
+                                                        .compareTo(toDate) < 0
+                                                && tempReadList
+                                                        .getValue()
+                                                        .get(columnNameList
+                                                                .indexOf("Resolution Date"))
+                                                        .compareTo(fromDate) > 0) {
+                                            weeklyRepData
+                                                    .setWithdrawn(weeklyRepData
+                                                            .getWithdrawn() + 1);
+                                            weeklyRepData
+                                                    .setTAT(weeklyRepData
+                                                            .getTAT()
+                                                            + Double.valueOf(tempReadList
+                                                                    .getValue()
+                                                                    .get(columnNameList
+                                                                            .indexOf("Turnaround Time(In Hours)"))));
+                                            weeklyRepData
+                                                    .setActualTime(weeklyRepData
+                                                            .getActualTime()
+                                                            + Double.valueOf(tempReadList
+                                                                    .getValue()
+                                                                    .get(columnNameList
+                                                                            .indexOf("Actual Hours"))));
 
-                                                if (!tempDate
-                                                        .equalsIgnoreCase(" ")) {
-                                                    Date getIssueAssignedDate = formatter
-                                                            .parse(tempDate);
+                                            grandTotal.setWithdrawn(grandTotal
+                                                    .getWithdrawn() + 1);
+                                            grandTotal
+                                                    .setTAT(grandTotal.getTAT()
+                                                            + Double.valueOf(tempReadList
+                                                                    .getValue()
+                                                                    .get(columnNameList
+                                                                            .indexOf("Turnaround Time(In Hours)"))));
+                                            grandTotal
+                                                    .setActualTime(grandTotal
+                                                            .getActualTime()
+                                                            + Double.valueOf(tempReadList
+                                                                    .getValue()
+                                                                    .get(columnNameList
+                                                                            .indexOf("Actual Hours"))));
 
-                                                    if (getIssueAssignedDate
-                                                            .compareTo(changeToDate) <= 0
-                                                            && getIssueAssignedDate
-                                                                    .compareTo(changeFromDate) >= 0) {
-                                                        weeklyRepData
-                                                                .setWithdrawn(weeklyRepData
-                                                                        .getWithdrawn() + 1);
-                                                        weeklyRepData
-                                                                .setTAT(weeklyRepData
-                                                                        .getTAT()
-                                                                        + Double.valueOf(tempReadList
-                                                                                .getValue()
-                                                                                .get(columnNameList
-                                                                                        .indexOf("Turnaround Time(In Hours)"))));
-                                                        weeklyRepData
-                                                                .setActualTime(weeklyRepData
-                                                                        .getActualTime()
-                                                                        + Double.valueOf(tempReadList
-                                                                                .getValue()
-                                                                                .get(columnNameList
-                                                                                        .indexOf("Actual Hours"))));
+                                            break;
 
-                                                        grandTotal
-                                                                .setWithdrawn(grandTotal
-                                                                        .getWithdrawn() + 1);
-                                                        grandTotal
-                                                                .setTAT(grandTotal
-                                                                        .getTAT()
-                                                                        + Double.valueOf(tempReadList
-                                                                                .getValue()
-                                                                                .get(columnNameList
-                                                                                        .indexOf("Turnaround Time(In Hours)"))));
-                                                        grandTotal
-                                                                .setActualTime(grandTotal
-                                                                        .getActualTime()
-                                                                        + Double.valueOf(tempReadList
-                                                                                .getValue()
-                                                                                .get(columnNameList
-                                                                                        .indexOf("Actual Hours"))));
-
-                                                        break;
-
-                                                    }
-
-                                                }
-                                            }
-
-                                            else if (tempStatusList.getValue()
-                                                    .get(0)
-                                                    .equalsIgnoreCase("Active")) {
-                                                weeklyRepData
-                                                        .setUnderWork(weeklyRepData
-                                                                .getUnderWork() + 1);
-                                                grandTotal
-                                                        .setUnderWork(grandTotal
-                                                                .getUnderWork() + 1);
-                                                break;
-                                            } else if (tempStatusList
-                                                    .getValue()
-                                                    .get(0)
-                                                    .equalsIgnoreCase(
-                                                            "Resolved")
-                                                    && tempReadList
-                                                            .getValue()
-                                                            .get(columnNameList
-                                                                    .indexOf("Resolution Date"))
-                                                            .compareTo(toDate) < 0
-                                                    && tempReadList
-                                                            .getValue()
-                                                            .get(columnNameList
-                                                                    .indexOf("Resolution Date"))
-                                                            .compareTo(fromDate) > 0) {
-                                                weeklyRepData
-                                                        .setClosed(weeklyRepData
-                                                                .getClosed() + 1);
-                                                weeklyRepData
-                                                        .setTAT(weeklyRepData
-                                                                .getTAT()
-                                                                + Double.valueOf(tempReadList
-                                                                        .getValue()
-                                                                        .get(columnNameList
-                                                                                .indexOf("Turnaround Time(In Hours)"))));
-                                                weeklyRepData
-                                                        .setActualTime(weeklyRepData
-                                                                .getActualTime()
-                                                                + Double.valueOf(tempReadList
-                                                                        .getValue()
-                                                                        .get(columnNameList
-                                                                                .indexOf("Actual Hours"))));
-                                                grandTotal.setClosed(grandTotal
-                                                        .getClosed() + 1);
-                                                grandTotal
-                                                        .setTAT(grandTotal
-                                                                .getTAT()
-                                                                + Double.valueOf(tempReadList
-                                                                        .getValue()
-                                                                        .get(columnNameList
-                                                                                .indexOf("Turnaround Time(In Hours)"))));
-                                                grandTotal
-                                                        .setActualTime(grandTotal
-                                                                .getActualTime()
-                                                                + Double.valueOf(tempReadList
-                                                                        .getValue()
-                                                                        .get(columnNameList
-                                                                                .indexOf("Actual Hours"))));
-                                                break;
-                                            }
+                                        } else if (tempStatusList.getValue()
+                                                .get(0)
+                                                .equalsIgnoreCase("Active")) {
+                                            weeklyRepData
+                                                    .setUnderWork(weeklyRepData
+                                                            .getUnderWork() + 1);
+                                            grandTotal.setUnderWork(grandTotal
+                                                    .getUnderWork() + 1);
+                                            break;
+                                        } else if (tempStatusList.getValue()
+                                                .get(0)
+                                                .equalsIgnoreCase("Resolved")
+                                                && tempReadList
+                                                        .getValue()
+                                                        .get(columnNameList
+                                                                .indexOf("Resolution Date"))
+                                                        .compareTo(toDate) < 0
+                                                && tempReadList
+                                                        .getValue()
+                                                        .get(columnNameList
+                                                                .indexOf("Resolution Date"))
+                                                        .compareTo(fromDate) > 0) {
+                                            weeklyRepData
+                                                    .setClosed(weeklyRepData
+                                                            .getClosed() + 1);
+                                            weeklyRepData
+                                                    .setTAT(weeklyRepData
+                                                            .getTAT()
+                                                            + Double.valueOf(tempReadList
+                                                                    .getValue()
+                                                                    .get(columnNameList
+                                                                            .indexOf("Turnaround Time(In Hours)"))));
+                                            weeklyRepData
+                                                    .setActualTime(weeklyRepData
+                                                            .getActualTime()
+                                                            + Double.valueOf(tempReadList
+                                                                    .getValue()
+                                                                    .get(columnNameList
+                                                                            .indexOf("Actual Hours"))));
+                                            grandTotal.setClosed(grandTotal
+                                                    .getClosed() + 1);
+                                            grandTotal
+                                                    .setTAT(grandTotal.getTAT()
+                                                            + Double.valueOf(tempReadList
+                                                                    .getValue()
+                                                                    .get(columnNameList
+                                                                            .indexOf("Turnaround Time(In Hours)"))));
+                                            grandTotal
+                                                    .setActualTime(grandTotal
+                                                            .getActualTime()
+                                                            + Double.valueOf(tempReadList
+                                                                    .getValue()
+                                                                    .get(columnNameList
+                                                                            .indexOf("Actual Hours"))));
+                                            break;
                                         }
-                                    } catch (ParseException e) {
-                                        System.out
-                                                .println("Date parsing failed!");
-                                        e.printStackTrace();
                                     }
                                 }
-
                             }
-                        }
 
+                        }
                     }
-                    weeklyRepData.setGrandTotalResolved(weeklyRepData
-                            .getClosed() + weeklyRepData.getWithdrawn());
-                    grandTotal.setGrandTotalResolved(grandTotal
-                            .getGrandTotalResolved()
-                            + weeklyRepData.getGrandTotalResolved());
-                    if (!Double.isNaN(weeklyRepData.getTAT()
-                            / weeklyRepData.getGrandTotalResolved())) {
-                        weeklyRepData.setTATPerTicket(dF.format(weeklyRepData
-                                .getTAT()
-                                / weeklyRepData.getGrandTotalResolved()));
-                    }
-                    weeklyReportList.add(weeklyRepData);
 
                 }
-            }
-            grandTotal.setTATPerTicket(dF.format(grandTotal.getTAT()
-                    / grandTotal.getGrandTotalResolved()));
-            weeklyReportList.add(grandTotal);
-            if (weeklyReportList.isEmpty())
-                return null;
-            else
-                return weeklyReportList;
-        }
+                weeklyRepData.setGrandTotalResolved(weeklyRepData.getClosed()
+                        + weeklyRepData.getWithdrawn());
+                grandTotal.setGrandTotalResolved(grandTotal
+                        .getGrandTotalResolved()
+                        + weeklyRepData.getGrandTotalResolved());
+                if (!Double.isNaN(weeklyRepData.getTAT()
+                        / weeklyRepData.getGrandTotalResolved())) {
+                    weeklyRepData.setTATPerTicket(dF.format(weeklyRepData
+                            .getTAT() / weeklyRepData.getGrandTotalResolved()));
+                }
+                weeklyReportList.add(weeklyRepData);
 
-        return weeklyReportList;
+            }
+        }
+        grandTotal.setTATPerTicket(dF.format(grandTotal.getTAT()
+                / grandTotal.getGrandTotalResolved()));
+        weeklyReportList.add(grandTotal);
+        if (weeklyReportList.isEmpty())
+            return null;
+        else
+            return weeklyReportList;
     }
 
     @Override
@@ -421,7 +389,8 @@ public class ReportService implements IReportService {
                                         .getValue()
                                         .get(columnNameList
                                                 .indexOf("Issue SubStatus")));
-                                validationData.setTAT(tempTAT);
+                                validationData
+                                        .setTAT(tempTAT);
                                 validationData
                                         .setActualTime(Double.valueOf(tempReadList
                                                 .getValue()
@@ -593,53 +562,33 @@ public class ReportService implements IReportService {
             String toDate) {
         ArrayList<String> columnNameList = read.firstEntry().getValue();
         ArrayList<BotRepData> weeklyReportList = new ArrayList<BotRepData>();
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-        try {
-            Date changeToDate = formatter.parse(toDate);
-            Date changeFromDate = formatter.parse(fromDate);
+        for (Entry<Integer, ArrayList<String>> tempBotList : read.entrySet()) {
 
-            for (Entry<Integer, ArrayList<String>> tempBotList : read
-                    .entrySet()) {
+            if (tempBotList.getKey() != 0
+                    && tempBotList.getValue()
+                            .get(columnNameList.indexOf("Issue Assigned Date"))
+                            .compareTo(toDate) < 0
+                    && tempBotList.getValue()
+                            .get(columnNameList.indexOf("Issue Assigned Date"))
+                            .compareTo(fromDate) > 0) {
 
-                if (tempBotList.getKey() != 0) {
-                    String tempDate = tempBotList.getValue().get(
-                            columnNameList.indexOf("Issue Assigned Date"));
-                    if (!tempDate.equalsIgnoreCase(" ")) {
-                        Date getIssueAssignedDate = formatter.parse(tempDate);
+                BotRepData tempBotRepData = new BotRepData();
+                tempBotRepData.setTitle(tempBotList.getValue().get(
+                        columnNameList.indexOf("Title")));
+                tempBotRepData.setIssueKeyword(tempBotList.getValue().get(
+                        columnNameList.indexOf("Issue Keyword")));
+                tempBotRepData.setAssignedDate(tempBotList.getValue().get(
+                        columnNameList.indexOf("Issue Assigned Date")));
+                tempBotRepData.setAssignedTo(tempBotList.getValue().get(
+                        columnNameList.indexOf("Assigned To")));
 
-                        if (getIssueAssignedDate.compareTo(changeToDate) <= 0
-                                && getIssueAssignedDate
-                                        .compareTo(changeFromDate) >= 0) {
-
-                            BotRepData tempBotRepData = new BotRepData();
-                            tempBotRepData.setTitle(tempBotList.getValue().get(
-                                    columnNameList.indexOf("Title")));
-                            tempBotRepData.setIssueKeyword(tempBotList
-                                    .getValue().get(
-                                            columnNameList
-                                                    .indexOf("Issue Keyword")));
-                            tempBotRepData.setAssignedDate(tempBotList
-                                    .getValue()
-                                    .get(columnNameList
-                                            .indexOf("Issue Assigned Date")));
-                            tempBotRepData
-                                    .setAssignedTo(tempBotList.getValue().get(
-                                            columnNameList
-                                                    .indexOf("Assigned To")));
-
-                            weeklyReportList.add(tempBotRepData);
-                        }
-                    }
-
-                }
+                weeklyReportList.add(tempBotRepData);
 
             }
 
-            return weeklyReportList;
-        } catch (ParseException e) {
-            System.out.println("Date Parsing failed!!");
-            e.printStackTrace();
-            return null;
         }
+
+        return weeklyReportList;
     }
+
 }

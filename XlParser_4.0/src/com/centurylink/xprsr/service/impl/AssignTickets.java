@@ -37,8 +37,20 @@ public class AssignTickets implements IAssignTickets {
 
     private String browseFile = (String) ServletActionContext.getRequest()
             .getSession().getAttribute("inputFilePath");
-    private TreeMap<Integer, ArrayList<String>> restrictedTickets = new TreeMap<Integer, ArrayList<String>>();
+
+    int assignedTicketCount = -1;
+    int totalTicketCount = -1;
+
+    public int getAssignedTicketCount() {
+        return assignedTicketCount;
+    }
     
+    public int getTotalTicketCount() {
+        return totalTicketCount;
+    }
+
+    private TreeMap<Integer, ArrayList<String>> restrictedTickets = new TreeMap<Integer, ArrayList<String>>();
+
     @Override
     public TreeMap<Integer, ArrayList<String>> countTickets(
             TreeMap<Integer, ArrayList<String>> dataSheet,
@@ -96,7 +108,9 @@ public class AssignTickets implements IAssignTickets {
                                 .equalsIgnoreCase(
                                         dataSheetEntry.getValue().get(2))
                                 && !tickStatList.contains(dataSheetEntry
-                                        .getValue().get(3))) {
+                                        .getValue().get(3))
+                                && !containsResKeywordList(dataSheetEntry
+                                        .getValue().get(5), resKeywordList)) {
                             totalcount++;
                             categoryCount = 0;
 
@@ -136,8 +150,37 @@ public class AssignTickets implements IAssignTickets {
         TreeMap<Integer, ArrayList<String>> newAssignedList = assignTo(
                 dataSheet, SortAssignment.getSortAssignmentList(), tempTTArr,
                 resKeywordList);
-        return newAssignedList;
 
+        /*
+         * for (Entry<Integer, ArrayList<String>> tempInputFile :
+         * newAssignedList .entrySet()) { Object temp =
+         * tempInputFile.getValue(); if (tempInputFile.getValue().get(3)
+         * .equalsIgnoreCase("WAITING FOR VENDOR")) {
+         * newAssignedList.remove(temp); }
+         * 
+         * }
+         */
+
+        TreeMap<Integer, ArrayList<String>> assignedListForDisplay = new TreeMap<Integer, ArrayList<String>>();
+        int key = 0;
+        for (Entry<Integer, ArrayList<String>> tempAssignedList : newAssignedList
+                .entrySet()) {
+            
+            totalTicketCount++;
+            if (!tempAssignedList.getValue().get(2).equalsIgnoreCase(" ")) {
+                assignedTicketCount++;
+            }
+
+            if (!tempAssignedList.getValue().get(3)
+                    .equalsIgnoreCase("WAITING FOR VENDOR")) {
+                assignedListForDisplay.put(key++,
+                        tempAssignedList.getValue());
+            }
+            
+            
+
+        }
+        return assignedListForDisplay;
     }
 
     /**
@@ -168,7 +211,7 @@ public class AssignTickets implements IAssignTickets {
             Integer status = new Integer(0);
             leastTickHolder = sortAssignmentList[0].getName();
 
-             System.out.println("Starting assignment for "+ leastTickHolder); 
+            System.out.println("Starting assignment for " + leastTickHolder);
 
             for (Entry<Integer, ArrayList<String>> dataSheetEntry : inputFile
                     .entrySet()) {
@@ -201,11 +244,9 @@ public class AssignTickets implements IAssignTickets {
                         inputFile.get(dataSheetEntry.getKey()).set(2,
                                 sortAssignmentList[0].getName());
 
-                        
-                          System.out.println("Assigned " +
-                          dataSheetEntry.getValue().get(1) + " to " +
-                          sortAssignmentList[0].getName());
-                         
+                        System.out.println("Assigned "
+                                + dataSheetEntry.getValue().get(1) + " to "
+                                + sortAssignmentList[0].getName());
 
                         sortAssignmentList[0].getCountArray()[tempVar]++;
                         sortAssignmentList[0].getCountArray()[0]--;
@@ -238,12 +279,12 @@ public class AssignTickets implements IAssignTickets {
                 for (Entry<Integer, ArrayList<String>> dataSheetEntry : inputFile
                         .entrySet()) {
                     int tempVar = 0;
-                    
+
                     if (sortAssignmentList[0].getCountArray()[0] <= 0)
                         break;
-                    
+
                     if (dataSheetEntry.getValue().get(2).equalsIgnoreCase(" ")) {
-                        
+
                         if (containsResKeywordList(dataSheetEntry.getValue()
                                 .get(5), resKeywordList)) {
                             restrictedTickets.put(dataSheetEntry.getKey(),
@@ -261,12 +302,13 @@ public class AssignTickets implements IAssignTickets {
 
                         inputFile.get(dataSheetEntry.getKey()).set(2,
                                 sortAssignmentList[0].getName());
-                        
-                        /*System.out.println("Assigned "
-                                + dataSheetEntry.getValue().get(1) + " to "
-                                + sortAssignmentList[0].getName()
-                                + " w/o category");*/
-                        
+
+                        /*
+                         * System.out.println("Assigned " +
+                         * dataSheetEntry.getValue().get(1) + " to " +
+                         * sortAssignmentList[0].getName() + " w/o category");
+                         */
+
                         sortAssignmentList[0].getCountArray()[tempVar]++;
                         sortAssignmentList[0].getCountArray()[0]--;
                         SortAssignment.sort(sortAssignmentList,
@@ -285,6 +327,7 @@ public class AssignTickets implements IAssignTickets {
         IWriteXlService writeXL = new WriteXlService();
         writeXL.writeToNewSheet(browseFile, restrictedTickets,
                 "RESTRICTED_TICKETS");
+
         return inputFile;
     }
 
@@ -404,9 +447,7 @@ public class AssignTickets implements IAssignTickets {
                             dataSheetEntry.getValue().get(5),
                             restrictedKeywords)) {
                 return true;
-            }
-            else if (containsResKeywordList(
-                    dataSheetEntry.getValue().get(5),
+            } else if (containsResKeywordList(dataSheetEntry.getValue().get(5),
                     restrictedKeywords)) {
                 restrictedTickets.put(dataSheetEntry.getKey(),
                         dataSheetEntry.getValue());
